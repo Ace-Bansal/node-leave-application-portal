@@ -2,12 +2,13 @@ var express = require("express");
 var app = express();
 var bodyParser = require("body-parser");
 var User = require("./models/user.js");
+// var Admin = require("./models/admin.js");
 var expressSession = require("express-session");
 var passport = require("passport");
 var LocalStrategy = require("passport-local");
 var passportLocalMongoose = require("passport-local-mongoose");
 var mongoose = require("mongoose");
-mongoose.connect("mongodb://localhost/lap");
+mongoose.connect("mongodb://localhost/lap15");
 
 app.use(expressSession({
   secret: "My name is Ekansh Bansal",
@@ -17,28 +18,45 @@ app.use(expressSession({
 app.use(passport.initialize());
 app.use(passport.session());
 
+// passport.use('local-admin', new LocalStrategy(Admin.authenticate()))
+// passport.serializeUser(Admin.serializeUser());
+// passport.deserializeUser(Admin.deserializeUser());
+
 passport.use(new LocalStrategy(User.authenticate()))
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 
+
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 
-function isLoggedIn(req, res, next){
-  if(req.isAuthenticated()){
+function isUserLoggedIn(req, res, next){
+  console.log(req.user);
+  if(req.isAuthenticated() && req.user.isAdmin == "no" && req.user.isStudent == "yes"){
     return next();
   } else{
     res.redirect("/login");
   }
 }
 
+function isAdminLoggedIn(req, res, next){
+  console.log(req.user);
+  if(req.isAuthenticated() && req.user.isAdmin == "yes" && req.user.isStudent == "no"){
+    return next();
+  } else{
+    res.redirect("/adminLogin");
+  }
+}
+
+
 
 app.get("/", function(req, res){
   res.render("landing")
 })
 
-app.get("/secret", isLoggedIn, function(req, res){
+//==================================USER ROUTES==========================
+app.get("/secret", isUserLoggedIn, function(req, res){
   res.send("Secret");
 })
 
@@ -50,9 +68,11 @@ app.post("/register", function(req, res){
   User.register(new User({username: req.body.username}), req.body.password, function(err, user){
     if(err){
       console.log("error at register route");
+      console.log(err);
       return res.render("register");
     } else{
       passport.authenticate("local")(req, res, function(){
+        console.log(user);
         res.redirect("/secret");
       })
     }
@@ -70,6 +90,50 @@ app.post("/login", passport.authenticate("local", {
 })
 
 app.get("/logout", function(req, res){
+  req.logout();
+  res.redirect("/");
+});
+
+//=========================================ADMIN ROUTES===========================
+app.get("/adminSecret", isAdminLoggedIn, function(req, res){
+  res.send("Admin Secret");
+})
+
+app.get("/adminRegister", function(req, res){
+  res.render("adminRegister");
+})
+
+app.post("/adminRegister", function(req, res){
+  User.register(new User({username: req.body.username}), req.body.password, function(err, user){
+    user.isStudent = "no";
+    user.isAdmin = "yes";
+    user.save();
+    if(err){
+      console.log("error at register route");
+      console.log(err);
+      return res.render("adminRegister");
+    } else{
+      passport.authenticate("local")(req, res, function(){
+        console.log(user);
+        // req.user._id = user._id;
+        // req.user.username = user.username;
+        res.redirect("/adminSecret");
+      })
+    }
+  })
+})
+
+app.get("/adminLogin", function(req, res){
+  res.render("adminLogin");
+})
+
+app.post("/adminLogin", passport.authenticate("local", {
+  successRedirect: "/adminSecret",
+  failureRedirect: "/adminLogin"
+}), function(req,res){
+})
+
+app.get("/adminLogout", function(req, res){
   req.logout();
   res.redirect("/");
 });
