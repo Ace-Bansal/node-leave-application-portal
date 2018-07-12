@@ -5,6 +5,8 @@
     <h3><%= user.applications[i].reasonForLeave %></h3>
     <% if(user.applications[i].isAccepted == "waiting"){ %>
       <p>Awaiting response</p>
+    <% } else if(user.applications[i].isAccepted == "no"){ %>
+      <p>Rejected</p>
     <% } %>
   </div>
 <% } %>
