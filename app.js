@@ -9,7 +9,7 @@ var passport = require("passport");
 var LocalStrategy = require("passport-local");
 var passportLocalMongoose = require("passport-local-mongoose");
 var mongoose = require("mongoose");
-mongoose.connect("mongodb://localhost/lap18");
+mongoose.connect("mongodb://localhost/lap27");
 
 app.use(expressSession({
   secret: "My name is Ekansh Bansal",
@@ -33,7 +33,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 
 function isUserLoggedIn(req, res, next){
-  console.log(req.user);
+  // console.log(req.user);
   if(req.isAuthenticated() && req.user.isAdmin == "no" && req.user.isStudent == "yes"){
     return next();
   } else{
@@ -42,7 +42,7 @@ function isUserLoggedIn(req, res, next){
 }
 
 function isAdminLoggedIn(req, res, next){
-  console.log(req.user);
+  // console.log(req.user);
   if(req.isAuthenticated() && req.user.isAdmin == "yes" && req.user.isStudent == "no"){
     return next();
   } else{
@@ -62,33 +62,43 @@ app.get("/studentHome", isUserLoggedIn, function(req, res){
 })
 
 app.post("/studentHome", function(req, res){
-  console.log(req.body.student);
-  var application = {
-    submitter: {
-      id: req.user._id,
-      name: req.body.student.name
-    },
-    reasonForLeave: req.body.student.reasonForLeave
-  }
-
   User.findById(req.user._id, function(err, user){
     if(err){
       console.log(err);
       console.log("error on the submit application route");
     } else{
-      user.name = req.body.student.name;
-      user.rollNo = req.body.student.rollNo;
-      user.reasonForLeave = req.body.student.reasonForLeave;
-      user.save();
+      var application = {
+        submitter: {
+          id: req.user._id,
+          name: req.body.student.name
+        },
+        reasonForLeave: req.body.student.reasonForLeave
+      }
       Application.create(application, function(err, createdApp){
         if(err){
           console.log(err);
           console.log("error on the create app route");
         } else{
-          res.send("submitted");
+          console.log(createdApp);
+          console.log(user.applications);
+          user.applications.push(createdApp);
+
+          user.name = req.body.student.name;
+          user.rollNo = req.body.student.rollNo;
+          user.reasonForLeave = req.body.student.reasonForLeave;
+          user.save();
+          // console.log(user.applications);
+
+          res.redirect("/applicationStatus");
         }
       })
     }
+  })
+})
+
+app.get("/applicationStatus", function(req, res){
+  User.findById(req.user._id).populate("applications").exec(function(err, user){
+    res.render("applicationStatus", {user: user})
   })
 })
 
@@ -104,7 +114,7 @@ app.post("/register", function(req, res){
       return res.render("register");
     } else{
       passport.authenticate("local")(req, res, function(){
-        console.log(user);
+        // console.log(user);
         res.redirect("/studentHome");
       })
     }
@@ -148,7 +158,7 @@ app.post("/adminRegister", function(req, res){
       return res.render("adminRegister");
     } else{
       passport.authenticate("local")(req, res, function(){
-        console.log(user);
+        // console.log(user);
         // req.user._id = user._id;
         // req.user.username = user.username;
         res.redirect("/adminHome");

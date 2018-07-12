@@ -2,4 +2,10 @@
 
 <% for(var i=0; i<applications.length; i++){ %>
   <div>Application submitted by <%= applications[i].submitter.name %>. Reason: <%= applications[i].reasonForLeave %></div>
+  <form action="/rejectApplication" method="post">
+    <button>Reject</button>
+  </form>
+  <form action="/acceptApplication" method="post">
+    <button>Accept</button>
+  </form>
 <% } %>

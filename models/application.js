@@ -8,7 +8,11 @@ var applicationSchema = new mongoose.Schema({
     },
     name: String
   },
-  reasonForLeave: String
+  reasonForLeave: String,
+  isAccepted: {
+    type: String,
+    default: "waiting"
+  }
 })
 
 module.exports = mongoose.model("Application", applicationSchema);

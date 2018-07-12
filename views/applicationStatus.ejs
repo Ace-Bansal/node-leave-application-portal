@@ -1,0 +1,10 @@
+<h1>Your Applications</h1>
+
+<% for(var i=0; i<user.applications.length; i++){ %>
+  <div>
+    <h3><%= user.applications[i].reasonForLeave %></h3>
+    <% if(user.applications[i].isAccepted == "waiting"){ %>
+      <p>Awaiting response</p>
+    <% } %>
+  </div>
+<% } %>

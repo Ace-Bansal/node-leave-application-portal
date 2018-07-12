@@ -14,7 +14,13 @@ var userSchema = new mongoose.Schema({
   isAdmin: {
     type: String,
     default: "no"
-  }
+  },
+  applications: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Application"
+    }
+  ]
 })
 
 userSchema.plugin(passportLocalMongoose);
