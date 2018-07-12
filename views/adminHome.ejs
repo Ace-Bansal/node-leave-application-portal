@@ -6,12 +6,14 @@
     <form action="/rejectApplication/<%= applications[i]._id %>" method="post">
       <button>Reject</button>
     </form>
-    <form action="/acceptApplication" method="post">
+    <form action="/acceptApplication/<%= applications[i]._id %>" method="post">
       <button>Accept</button>
     </form>
   <% } else if(applications[i].isAccepted == "no"){ %>
     <p>REJECTED</p>
-  <% } %>
+  <% } else if(applications[i].isAccepted == "yes"){ %>
+    <p>ACCEPTED</p>
+  <% } %>%>
 
 
 <% } %>

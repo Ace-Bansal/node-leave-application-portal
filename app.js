@@ -156,6 +156,20 @@ app.post("/rejectApplication/:appId", function(req, res){
   })
 })
 
+app.post("/acceptApplication/:appId", function(req, res){
+  Application.findById(req.params.appId, function(err, application){
+    if(err){
+      console.log(err);
+      console.log("error on the reject application route");
+    } else{
+      application.isAccepted = "yes";
+      application.save();
+      res.redirect("/adminHome")
+    }
+  })
+})
+
+
 app.get("/adminRegister", function(req, res){
   res.render("adminRegister");
 })

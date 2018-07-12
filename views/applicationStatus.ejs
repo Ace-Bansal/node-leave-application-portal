@@ -7,6 +7,8 @@
       <p>Awaiting response</p>
     <% } else if(user.applications[i].isAccepted == "no"){ %>
       <p>Rejected</p>
-    <% } %>
+    <% } else if(user.applications[i].isAccepted == "yes"){ %>
+      <p>Accepted</p>
+    <% } %>%>
   </div>
 <% } %>
