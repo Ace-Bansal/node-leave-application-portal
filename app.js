@@ -2,13 +2,14 @@ var express = require("express");
 var app = express();
 var bodyParser = require("body-parser");
 var User = require("./models/user.js");
+var Application = require("./models/application.js");
 // var Admin = require("./models/admin.js");
 var expressSession = require("express-session");
 var passport = require("passport");
 var LocalStrategy = require("passport-local");
 var passportLocalMongoose = require("passport-local-mongoose");
 var mongoose = require("mongoose");
-mongoose.connect("mongodb://localhost/lap15");
+mongoose.connect("mongodb://localhost/lap18");
 
 app.use(expressSession({
   secret: "My name is Ekansh Bansal",
@@ -56,8 +57,39 @@ app.get("/", function(req, res){
 })
 
 //==================================USER ROUTES==========================
-app.get("/secret", isUserLoggedIn, function(req, res){
-  res.send("Secret");
+app.get("/studentHome", isUserLoggedIn, function(req, res){
+  res.render("studentHome");
+})
+
+app.post("/studentHome", function(req, res){
+  console.log(req.body.student);
+  var application = {
+    submitter: {
+      id: req.user._id,
+      name: req.body.student.name
+    },
+    reasonForLeave: req.body.student.reasonForLeave
+  }
+
+  User.findById(req.user._id, function(err, user){
+    if(err){
+      console.log(err);
+      console.log("error on the submit application route");
+    } else{
+      user.name = req.body.student.name;
+      user.rollNo = req.body.student.rollNo;
+      user.reasonForLeave = req.body.student.reasonForLeave;
+      user.save();
+      Application.create(application, function(err, createdApp){
+        if(err){
+          console.log(err);
+          console.log("error on the create app route");
+        } else{
+          res.send("submitted");
+        }
+      })
+    }
+  })
 })
 
 app.get("/register", function(req, res){
@@ -73,7 +105,7 @@ app.post("/register", function(req, res){
     } else{
       passport.authenticate("local")(req, res, function(){
         console.log(user);
-        res.redirect("/secret");
+        res.redirect("/studentHome");
       })
     }
   })
@@ -84,7 +116,7 @@ app.get("/login", function(req, res){
 })
 
 app.post("/login", passport.authenticate("local", {
-  successRedirect: "/secret",
+  successRedirect: "/studentHome",
   failureRedirect: "/login"
 }), function(req,res){
 })
@@ -94,9 +126,11 @@ app.get("/logout", function(req, res){
   res.redirect("/");
 });
 
-//=========================================ADMIN ROUTES===========================
-app.get("/adminSecret", isAdminLoggedIn, function(req, res){
-  res.send("Admin Secret");
+//=========================================ADMIN ROUTES=========================
+app.get("/adminHome", isAdminLoggedIn, function(req, res){
+  Application.find({}, function(err, applications){
+    res.render("adminHome", {applications: applications});
+  })
 })
 
 app.get("/adminRegister", function(req, res){
@@ -117,7 +151,7 @@ app.post("/adminRegister", function(req, res){
         console.log(user);
         // req.user._id = user._id;
         // req.user.username = user.username;
-        res.redirect("/adminSecret");
+        res.redirect("/adminHome");
       })
     }
   })
@@ -128,7 +162,7 @@ app.get("/adminLogin", function(req, res){
 })
 
 app.post("/adminLogin", passport.authenticate("local", {
-  successRedirect: "/adminSecret",
+  successRedirect: "/adminHome",
   failureRedirect: "/adminLogin"
 }), function(req,res){
 })
