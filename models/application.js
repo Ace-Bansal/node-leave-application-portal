@@ -8,7 +8,11 @@ var applicationSchema = new mongoose.Schema({
     },
     name: String
   },
+  from: String,
+  to: String,
+  totalDays: Number,
   reasonForLeave: String,
+  natureOfLeave: String,
   isAccepted: {
     type: String,
     default: "waiting"

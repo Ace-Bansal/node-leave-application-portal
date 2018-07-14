@@ -9,7 +9,7 @@ var passport = require("passport");
 var LocalStrategy = require("passport-local");
 var passportLocalMongoose = require("passport-local-mongoose");
 var mongoose = require("mongoose");
-mongoose.connect("mongodb://localhost/lap27");
+mongoose.connect("mongodb://localhost/lap30");
 
 app.use(expressSession({
   secret: "My name is Ekansh Bansal",
@@ -62,30 +62,25 @@ app.get("/studentHome", isUserLoggedIn, function(req, res){
 })
 
 app.post("/studentHome", function(req, res){
+  var newApplication = req.body.application;
   User.findById(req.user._id, function(err, user){
     if(err){
       console.log(err);
       console.log("error on the submit application route");
     } else{
-      var application = {
-        submitter: {
-          id: req.user._id,
-          name: req.body.student.name
-        },
-        reasonForLeave: req.body.student.reasonForLeave
-      }
-      Application.create(application, function(err, createdApp){
+      Application.create(newApplication, function(err, createdApp){
         if(err){
           console.log(err);
           console.log("error on the create app route");
         } else{
           console.log(createdApp);
           console.log(user.applications);
+          createdApp.submitter.id = req.user._id;
+          createdApp.submitter.name = user.username;
+          createdApp.save();
           user.applications.push(createdApp);
 
-          user.name = req.body.student.name;
-          user.rollNo = req.body.student.rollNo;
-          user.reasonForLeave = req.body.student.reasonForLeave;
+          user.reasonForLeave = newApplication.reasonForLeave;
           user.save();
           // console.log(user.applications);
 
@@ -107,7 +102,7 @@ app.get("/register", function(req, res){
 })
 
 app.post("/register", function(req, res){
-  User.register(new User({username: req.body.username}), req.body.password, function(err, user){
+  User.register(new User({username: req.body.username, rollNo: req.body.rollNo}), req.body.password, function(err, user){
     if(err){
       console.log("error at register route");
       console.log(err);
@@ -169,6 +164,16 @@ app.post("/acceptApplication/:appId", function(req, res){
   })
 })
 
+app.get("/application/:appId", function(req, res){
+  Application.findById(req.params.appId, function(err, application){
+    if(err){
+      console.log(err);
+      console.log("error on the show application route");
+    } else{
+      res.render("applicationShow", {application: application})
+    }
+  })
+})
 
 app.get("/adminRegister", function(req, res){
   res.render("adminRegister");

@@ -1,9 +1,15 @@
 <h1>Leave Application</h1>
 
 <form action="/studentHome" method="post">
-  <input type="text" name="student[name]" placeholder="Name">
-  <input type="text" name="student[rollNo]" placeholder="Roll No.">
-  <input type="text" name="student[reasonForLeave]" placeholder="Reason For Leave">
+  <label>From</label>
+  <input type="date" name="application[from]" placeholder="From">
+  <label>To</label>
+  <input type="date" name="application[to]" placeholder="To">
+  <label for="totalDays">Total Days</label>
+  <input type="number" name="application[totalDays]" value="Total Days">
+  <input type="text" name="application[reasonForLeave]" placeholder="Reason For Leave">
+  <br>
+  <input type="text" name="application[natureOfLeave]" placeholder="Nature Of Leave">
   <button>Submit</button>
 </form>
 

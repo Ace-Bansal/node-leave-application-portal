@@ -1,0 +1,30 @@
+<strong>Submitted by:</strong>
+<p><%= application.submitter.name %></p>
+
+<strong>From:</strong>
+<p><%= application.from %></p>
+
+<strong>To:</strong>
+<p><%= application.to %></p>
+
+<strong>Total days:</strong>
+<p><%= application.totalDays %></p>
+
+<strong>Reason for leave:</strong>
+<p><%= application.reasonForLeave %></p>
+
+<strong>Nature of leave:</strong>
+<p><%= application.natureOfLeave %></p>
+
+<% if(application.isAccepted == "waiting"){ %>
+  <form action="/rejectApplication/<%= application._id %>" method="post">
+    <button>Reject</button>
+  </form>
+  <form action="/acceptApplication/<%= application._id %>" method="post">
+    <button>Accept</button>
+  </form>
+<% } else if(application.isAccepted == "no"){ %>
+  <p>REJECTED</p>
+<% } else if(application.isAccepted == "yes"){ %>
+  <p>ACCEPTED</p>
+<% } %>
