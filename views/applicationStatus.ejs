@@ -3,6 +3,7 @@
 <% for(var i=0; i<user.applications.length; i++){ %>
   <div>
     <h3><%= user.applications[i].reasonForLeave %></h3>
+    <a href="/application/<%= user.applications[i]._id %>">View application</a>
     <% if(user.applications[i].isAccepted == "waiting"){ %>
       <p>Awaiting response</p>
     <% } else if(user.applications[i].isAccepted == "no"){ %>
