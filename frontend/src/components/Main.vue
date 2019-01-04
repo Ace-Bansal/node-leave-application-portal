@@ -1,12 +1,17 @@
 <template>
   <div class="main">
-    Hello World
+    <Apply/>
   </div>
 </template>
 
 <script>
+import Apply from "../components/Apply"
+
 export default {
-  name: 'Main'
+  name: 'Main',
+  components: {
+    Apply
+  }
 }
 </script>
 
