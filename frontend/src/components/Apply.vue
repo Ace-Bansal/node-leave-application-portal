@@ -1,65 +1,76 @@
 <template>
     <section id="form" class="container">
         <form @submit.prevent="processForm">
-            <div class="field">
-                <label class="label" for="startDate">From</label>
-                <div class="control">
-                    <input class="input" type="text" v-model="startDate" placeholder="Start Date of Leave">
-                </div>
-            </div>
 
-            <div class="field">
-                <label class="label" for="enddate">To</label>
-                <div class="control">
-                    <input class="input" type="date" v-model="endDate">
-                </div>
-            </div>
+            <label for="" class="label">Start Date</label>
+            <date-picker v-model="leave_data.startDate" lang="en" format="DD/MM/YYYY" name="startDate" placeholder="Start Date" width="100%" class="date"></date-picker>
+
+            <label for="" class="label">End Date</label>
+            <date-picker v-model="leave_data.endDate" lang="en" format="DD/MM/YYYY" placeholder="End Date" width="100%" class="date"></date-picker>
 
             <div class="field">
                 <label class="label" for="totalDays">Total Days</label>
                 <div class="control">
-                    <input class="input" type="number" v-model="totalDays" placeholder="Number of Days">
+                    <input class="input" required type="number" v-model="leave_data.totalDays" placeholder="Number of Days">
                 </div>
             </div>
 
             <div class="field">
                 <label class="label" for="reason">Reason for Leave</label>
                 <div class="control">
-                    <textarea class="textarea" type="text" v-model="reason" placeholder="Type in your reason for leave" />
+                    <textarea class="textarea" required type="text" v-model="leave_data.reason" placeholder="Type in your reason for leave" />
                 </div>
             </div>
 
             <div class="field">
                 <label class="label" for="nature">Nature of Leave</label>
                 <div class="control">
-                    <input class="input" type="text" v-model="nature" placeholder="Type in your nature of leave">
+                    <input class="input" type="text" required v-model="leave_data.nature" placeholder="Type in your nature of leave">
                 </div>
+                <p class="help is-danger"> {{ error }} </p>
             </div>
 
             <div class="field">
                 <div class="control">
-                    <button class="button is-primary is-fullwidth" type="submit" >Submit</button>
+                    <button class="button is-info is-fullwidth" type="submit" >Submit</button>
                 </div>
             </div>
+            {{ leave_data.startDate }}
         </form>
     </section>
 </template>
 
 <script>
+import DatePicker from 'vue2-datepicker'
+
 export default {
     name: "Apply",
+    components: {
+        DatePicker
+    },
     data() {
         return {
-            startDate: '',
-            endDate: '',
-            totalDays: undefined,
-            reason: '',
-            nature: ''
+            leave_data : {
+                startDate: '',
+                endDate: '',
+                totalDays: undefined,
+                reason: '',
+                nature: ''
+            },
+            error: ''
         }
     },
     methods: {
         processForm() {
-            console.log("Submitted")
+            if(this.leave_data.startDate.length === 0 || this.leave_data.endDate.length === 0) {
+                this.error = "All fields are required"
+                setTimeout(() => {
+                    this.error = ""
+                }, 4000)
+            } else {
+                // Do the API Call to save this into DB
+                console.log(this.leave_data)
+            }
         }
     }
 }
@@ -70,4 +81,14 @@ export default {
     width: 40%;
     margin: 0 auto;
 }
+
+#form {
+    padding-top: 2rem;
+}
+
+.date {
+    padding-top: 0.25rem;
+    padding-bottom: 1rem;
+}
+
 </style>

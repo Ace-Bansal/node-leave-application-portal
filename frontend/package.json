@@ -9,8 +9,10 @@
   },
   "dependencies": {
     "reset-css": "^4.0.1",
+    "vee-validate": "^2.1.5",
     "vue": "^2.5.17",
     "vue-router": "^3.0.1",
+    "vue2-datepicker": "^2.6.4",
     "vuejs-datepicker": "^1.5.4"
   },
   "devDependencies": {
